@@ -1,101 +1,160 @@
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
 # ============================================================
-# CONFIGURAÇÃO DA PÁGINA
+# CONFIGURAÇÃO
 # ============================================================
 
 st.set_page_config(
-    page_title="Dashboard de Sinalização Ferroviária",
+    page_title="Sinalização Ferroviária",
+    page_icon=None,
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-
 # ============================================================
-# ESTILO VISUAL
+# ESTILO
 # ============================================================
 
 st.markdown("""
 <style>
 
-    /* Fundo principal */
+    /* Fundo geral */
     .stApp {
-        background-color: #f5f7fa;
+        background-color: #080d14;
+        color: #e8edf5;
     }
 
-    /* Cabeçalho */
-    .main-header {
-        background: linear-gradient(
-            135deg,
-            #172033 0%,
-            #26364f 100%
-        );
-        padding: 30px;
-        border-radius: 15px;
-        margin-bottom: 25px;
-        color: white;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    }
-
-    .main-header h1 {
-        margin: 0;
-        font-size: 36px;
-    }
-
-    .main-header p {
-        margin-top: 8px;
-        font-size: 16px;
-        color: #d9e1ec;
-    }
-
-    /* Cartões */
-    .metric-card {
-        background-color: white;
-        padding: 20px;
-        border-radius: 12px;
-        border: 1px solid #e1e5eb;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.06);
-        text-align: center;
-    }
-
-    .metric-title {
-        color: #687386;
-        font-size: 14px;
-        margin-bottom: 8px;
-    }
-
-    .metric-value {
-        color: #172033;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    /* Seções */
-    .section-title {
-        color: #172033;
-        font-size: 24px;
-        font-weight: bold;
-        margin-top: 25px;
-        margin-bottom: 5px;
-    }
-
-    .section-description {
-        color: #687386;
-        margin-bottom: 15px;
+    /* Área principal */
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        max-width: 1500px;
     }
 
     /* Sidebar */
     section[data-testid="stSidebar"] {
-        background-color: #172033;
+        background-color: #0b111a;
+        border-right: 1px solid #1c2a3a;
     }
 
     section[data-testid="stSidebar"] * {
-        color: white;
+        color: #dbe5f2;
+    }
+
+    /* Título principal */
+    .titulo {
+        background: linear-gradient(
+            135deg,
+            #111c2b 0%,
+            #0b1420 100%
+        );
+
+        border: 1px solid #20344b;
+        border-radius: 12px;
+
+        padding: 28px 32px;
+        margin-bottom: 25px;
+
+        box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+
+    .titulo h1 {
+        color: #f3f6fa;
+        font-size: 42px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .titulo p {
+        color: #9fb3ca;
+        font-size: 17px;
+        margin-top: 8px;
+        margin-bottom: 0;
+    }
+
+    /* Títulos das seções */
+    .secao {
+        color: #dce8f7;
+        font-size: 23px;
+        font-weight: 600;
+        margin-top: 30px;
+        margin-bottom: 15px;
+        border-left: 4px solid #2878d7;
+        padding-left: 12px;
+    }
+
+    /* Cards */
+    .card {
+        background: linear-gradient(
+            145deg,
+            #101a27,
+            #0b131e
+        );
+
+        border: 1px solid #1d3045;
+        border-radius: 10px;
+
+        padding: 20px;
+
+        min-height: 115px;
+
+        box-shadow: 0 5px 20px rgba(0,0,0,0.20);
+    }
+
+    .card-title {
+        color: #91a7bf;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .card-value {
+        color: #f0f4f9;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    /* Painéis dos gráficos */
+    .painel {
+        background-color: #0d1621;
+        border: 1px solid #1c2d40;
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+
+    .painel h3 {
+        color: #e7edf5;
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .painel p {
+        color: #899db4;
+        font-size: 13px;
+    }
+
+    /* Texto */
+    p, label {
+        color: #aabbd0;
+    }
+
+    /* Selectbox */
+    div[data-baseweb="select"] > div {
+        background-color: #111c29;
+        border-color: #263a50;
+    }
+
+    /* Tabela */
+    .stDataFrame {
+        border: 1px solid #203246;
+    }
+
+    /* Divisórias */
+    hr {
+        border-color: #1b2b3d;
     }
 
 </style>
@@ -103,7 +162,7 @@ st.markdown("""
 
 
 # ============================================================
-# CARREGAR DATASET
+# CARREGAMENTO DO DATASET
 # ============================================================
 
 @st.cache_data
@@ -115,82 +174,110 @@ df = carregar_dados()
 
 
 # ============================================================
-# CABEÇALHO
-# ============================================================
-
-st.markdown("""
-<div class="main-header">
-
-    <h1> Sinalização Ferroviária</h1>
-
-    <p>
-        Dashboard de análise de headway, velocidade,
-        ocupação dos circuitos e aspectos dos sinais.
-    </p>
-
-</div>
-""", unsafe_allow_html=True)
-
-
-# ============================================================
 # SIDEBAR
 # ============================================================
 
-st.sidebar.title("🚆 Controle")
+with st.sidebar:
 
-st.sidebar.markdown("---")
+    st.markdown(
+        """
+        <h2 style="color:#eef3f8;">
+            Sinalização Ferroviária
+        </h2>
+        """,
+        unsafe_allow_html=True
+    )
 
-st.sidebar.subheader("Filtros")
+    st.markdown("---")
 
-tipos_disponiveis = sorted(
-    df["tipo_sinalizacao"].dropna().unique()
-)
+    st.markdown("### Filtros")
 
-tipos_selecionados = st.sidebar.multiselect(
-    "Tipo de sinalização",
-    options=tipos_disponiveis,
-    default=tipos_disponiveis
-)
+    tipos = sorted(df["tipo_sinalizacao"].dropna().unique())
 
-aspectos_disponiveis = sorted(
-    df["aspecto_sinal"].dropna().unique()
-)
+    tipos_selecionados = st.multiselect(
+        "Tipo de sinalização",
+        tipos,
+        default=tipos
+    )
 
-aspectos_selecionados = st.sidebar.multiselect(
-    "Aspecto do sinal",
-    options=aspectos_disponiveis,
-    default=aspectos_disponiveis
-)
+    aspectos = sorted(df["aspecto_sinal"].dropna().unique())
+
+    aspectos_selecionados = st.multiselect(
+        "Aspecto do sinal",
+        aspectos,
+        default=aspectos
+    )
+
+    # Aplicação dos filtros
+    df_filtrado = df[
+        df["tipo_sinalizacao"].isin(tipos_selecionados)
+        & df["aspecto_sinal"].isin(aspectos_selecionados)
+    ]
+
+    st.markdown("---")
+
+    st.markdown("### Informações do dataset")
+
+    st.write(f"Registros: **{len(df_filtrado):,}**")
+    st.write(
+        f"Linhas: **{df_filtrado['linha'].nunique()}**"
+    )
+    st.write(
+        f"Blocos: **{df_filtrado['id_bloco'].nunique()}**"
+    )
+
+    st.markdown("---")
+
+    st.markdown(
+        """
+        <div style="
+            color:#71869d;
+            font-size:13px;
+            line-height:1.6;
+        ">
+        Análise de dados aplicada à sinalização ferroviária,
+        considerando headway, velocidade permitida,
+        ocupação dos circuitos e aspectos dos sinais.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 # ============================================================
-# APLICAR FILTROS
-# ============================================================
-
-df_filtrado = df[
-    df["tipo_sinalizacao"].isin(tipos_selecionados)
-    &
-    df["aspecto_sinal"].isin(aspectos_selecionados)
-]
-
-
-# ============================================================
-# INDICADORES
+# CABEÇALHO
 # ============================================================
 
 st.markdown(
-    '<div class="section-title">📊 Visão geral</div>',
+    """
+    <div class="titulo">
+
+        <h1>Sinalização Ferroviária</h1>
+
+        <p>
+        Dashboard de análise de headway, velocidade,
+        ocupação dos circuitos e aspectos dos sinais.
+        </p>
+
+    </div>
+    """,
     unsafe_allow_html=True
 )
+
+
+# ============================================================
+# VISÃO GERAL
+# ============================================================
 
 st.markdown(
-    '<div class="section-description">'
-    'Resumo dos dados selecionados pelos filtros.'
-    '</div>',
+    '<div class="secao">Visão geral</div>',
     unsafe_allow_html=True
 )
 
+col1, col2, col3, col4, col5 = st.columns(5)
 
+
+# Valores
 total_registros = len(df_filtrado)
 
 total_linhas = df_filtrado["linha"].nunique()
@@ -199,166 +286,212 @@ total_blocos = df_filtrado["id_bloco"].nunique()
 
 headway_medio = df_filtrado["headway_seg"].mean()
 
-velocidade_media = df_filtrado["velocidade_permitida_kmh"].mean()
+velocidade_media = df_filtrado[
+    "velocidade_permitida_kmh"
+].mean()
 
 
-col1, col2, col3, col4 = st.columns(4)
+def card(coluna, titulo, valor):
+
+    with coluna:
+
+        st.markdown(
+            f"""
+            <div class="card">
+
+                <div class="card-title">
+                    {titulo}
+                </div>
+
+                <div class="card-value">
+                    {valor}
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 
-with col1:
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Registros</div>
-        <div class="metric-value">{total_registros:,}</div>
-    </div>
-    """, unsafe_allow_html=True)
+card(
+    col1,
+    "Registros",
+    f"{total_registros:,}".replace(",", ".")
+)
+
+card(
+    col2,
+    "Linhas",
+    total_linhas
+)
+
+card(
+    col3,
+    "Blocos",
+    total_blocos
+)
+
+card(
+    col4,
+    "Headway médio",
+    f"{headway_medio:.1f} s"
+)
+
+card(
+    col5,
+    "Velocidade média",
+    f"{velocidade_media:.1f} km/h"
+)
 
 
-with col2:
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Linhas</div>
-        <div class="metric-value">{total_linhas}</div>
-    </div>
-    """, unsafe_allow_html=True)
+# ============================================================
+# GRÁFICOS
+# ============================================================
 
+st.markdown(
+    '<div class="secao">Análise dos dados</div>',
+    unsafe_allow_html=True
+)
 
-with col3:
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Blocos</div>
-        <div class="metric-value">{total_blocos}</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
-with col4:
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Headway médio</div>
-        <div class="metric-value">{headway_medio:.1f}s</div>
-    </div>
-    """, unsafe_allow_html=True)
+col1, col2 = st.columns(2)
 
 
 # ============================================================
 # GRÁFICO 1
 # ============================================================
 
-st.markdown(
-    '<div class="section-title">'
-    '🔎 1. Velocidade x Tempo de Ocupação'
-    '</div>',
-    unsafe_allow_html=True
-)
+with col1:
 
-st.markdown(
-    '<div class="section-description">'
-    'Relação entre a velocidade permitida e o tempo '
-    'de ocupação do circuito.'
-    '</div>',
-    unsafe_allow_html=True
-)
+    st.markdown(
+        """
+        <div class="painel">
 
+        <h3>
+        Velocidade permitida x tempo de ocupação
+        </h3>
 
-fig1, ax1 = plt.subplots(figsize=(11, 5.5))
+        <p>
+        Relação entre a velocidade autorizada pelo sinal
+        e o tempo de ocupação do circuito.
+        </p>
 
-sns.scatterplot(
-    data=df_filtrado,
-    x="velocidade_permitida_kmh",
-    y="tempo_ocupacao_circuito_seg",
-    hue="tipo_sinalizacao",
-    s=55,
-    alpha=0.7,
-    ax=ax1
-)
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-ax1.set_xlabel(
-    "Velocidade permitida (km/h)",
-    fontsize=11
-)
+    fig, ax = plt.subplots(figsize=(7, 5))
 
-ax1.set_ylabel(
-    "Tempo de ocupação (segundos)",
-    fontsize=11
-)
+    fig.patch.set_facecolor("#0d1621")
+    ax.set_facecolor("#0d1621")
 
-ax1.set_title(
-    "Velocidade permitida x tempo de ocupação",
-    fontsize=15,
-    fontweight="bold"
-)
+    sns.scatterplot(
+        data=df_filtrado,
+        x="velocidade_permitida_kmh",
+        y="tempo_ocupacao_circuito_seg",
+        hue="tipo_sinalizacao",
+        palette="deep",
+        s=45,
+        alpha=0.75,
+        ax=ax
+    )
 
-ax1.grid(
-    True,
-    linestyle="--",
-    alpha=0.25
-)
+    ax.set_xlabel(
+        "Velocidade permitida (km/h)",
+        color="#aabbd0"
+    )
 
-sns.despine()
+    ax.set_ylabel(
+        "Tempo de ocupação (s)",
+        color="#aabbd0"
+    )
 
-plt.tight_layout()
+    ax.tick_params(colors="#91a7bf")
 
-st.pyplot(fig1, use_container_width=True)
+    for spine in ax.spines.values():
+        spine.set_color("#26394d")
+
+    ax.grid(
+        alpha=0.15,
+        color="#789"
+    )
+
+    legend = ax.legend(
+        title="Tipo de sinalização"
+    )
+
+    legend.get_frame().set_facecolor("#101b29")
+    legend.get_frame().set_edgecolor("#263a50")
+
+    plt.tight_layout()
+
+    st.pyplot(fig)
+
+    plt.close(fig)
 
 
 # ============================================================
 # GRÁFICO 2
 # ============================================================
 
-st.markdown(
-    '<div class="section-title">'
-    '📦 2. Distribuição do Headway'
-    '</div>',
-    unsafe_allow_html=True
-)
+with col2:
 
-st.markdown(
-    '<div class="section-description">'
-    'Distribuição do intervalo de tempo entre trens '
-    'por tipo de sinalização.'
-    '</div>',
-    unsafe_allow_html=True
-)
+    st.markdown(
+        """
+        <div class="painel">
 
+        <h3>
+        Distribuição do headway
+        </h3>
 
-fig2, ax2 = plt.subplots(figsize=(11, 5.5))
+        <p>
+        Comparação da distribuição do intervalo entre
+        a passagem de trens.
+        </p>
 
-sns.boxplot(
-    data=df_filtrado,
-    x="tipo_sinalizacao",
-    y="headway_seg",
-    ax=ax2
-)
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-ax2.set_xlabel(
-    "Tipo de sinalização",
-    fontsize=11
-)
+    fig, ax = plt.subplots(figsize=(7, 5))
 
-ax2.set_ylabel(
-    "Headway (segundos)",
-    fontsize=11
-)
+    fig.patch.set_facecolor("#0d1621")
+    ax.set_facecolor("#0d1621")
 
-ax2.set_title(
-    "Distribuição do headway por tipo de sinalização",
-    fontsize=15,
-    fontweight="bold"
-)
+    sns.boxplot(
+        data=df_filtrado,
+        x="tipo_sinalizacao",
+        y="headway_seg",
+        palette="deep",
+        ax=ax
+    )
 
-ax2.grid(
-    True,
-    axis="y",
-    linestyle="--",
-    alpha=0.25
-)
+    ax.set_xlabel(
+        "Tipo de sinalização",
+        color="#aabbd0"
+    )
 
-sns.despine()
+    ax.set_ylabel(
+        "Headway (segundos)",
+        color="#aabbd0"
+    )
 
-plt.tight_layout()
+    ax.tick_params(colors="#91a7bf")
 
-st.pyplot(fig2, use_container_width=True)
+    for spine in ax.spines.values():
+        spine.set_color("#26394d")
+
+    ax.grid(
+        axis="y",
+        alpha=0.15
+    )
+
+    plt.tight_layout()
+
+    st.pyplot(fig)
+
+    plt.close(fig)
 
 
 # ============================================================
@@ -366,127 +499,110 @@ st.pyplot(fig2, use_container_width=True)
 # ============================================================
 
 st.markdown(
-    '<div class="section-title">'
-    '🚦 3. Aspectos dos Sinais'
-    '</div>',
+    """
+    <div class="painel">
+
+    <h3>
+    Aspectos dos sinais por tipo de sinalização
+    </h3>
+
+    <p>
+    Quantidade de ocorrências dos diferentes aspectos
+    dos sinais.
+    </p>
+
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
-st.markdown(
-    '<div class="section-description">'
-    'Quantidade de sinais verdes, amarelos e vermelhos '
-    'por tipo de sinalização.'
-    '</div>',
-    unsafe_allow_html=True
-)
-
-
-contagem = pd.crosstab(
+tabela_aspectos = pd.crosstab(
     df_filtrado["tipo_sinalizacao"],
     df_filtrado["aspecto_sinal"]
 )
 
+fig, ax = plt.subplots(figsize=(12, 5))
 
-fig3, ax3 = plt.subplots(figsize=(11, 5.5))
+fig.patch.set_facecolor("#0d1621")
+ax.set_facecolor("#0d1621")
 
-
-# Garantir uma ordem lógica dos sinais quando disponíveis
-ordem_aspectos = [
-    aspecto
-    for aspecto in ["Verde", "Amarelo", "Vermelho"]
-    if aspecto in contagem.columns
-]
-
-# Caso o dataset use outra capitalização,
-# mantém as colunas existentes
-outras_colunas = [
-    coluna
-    for coluna in contagem.columns
-    if coluna not in ordem_aspectos
-]
-
-contagem = contagem[
-    ordem_aspectos + outras_colunas
-]
-
-
-contagem.plot(
+tabela_aspectos.plot(
     kind="bar",
     stacked=True,
-    ax=ax3
+    ax=ax,
+    colormap="viridis"
 )
 
-
-ax3.set_xlabel(
+ax.set_xlabel(
     "Tipo de sinalização",
-    fontsize=11
+    color="#aabbd0"
 )
 
-ax3.set_ylabel(
+ax.set_ylabel(
     "Quantidade de ocorrências",
-    fontsize=11
+    color="#aabbd0"
 )
 
-ax3.set_title(
-    "Aspectos dos sinais por tipo de sinalização",
-    fontsize=15,
-    fontweight="bold"
-)
+ax.tick_params(colors="#91a7bf")
 
-ax3.tick_params(
-    axis="x",
-    rotation=0
-)
+for spine in ax.spines.values():
+    spine.set_color("#26394d")
 
-ax3.grid(
-    True,
+ax.grid(
     axis="y",
-    linestyle="--",
-    alpha=0.25
+    alpha=0.15
 )
 
-ax3.legend(
+legend = ax.legend(
     title="Aspecto do sinal"
 )
 
-sns.despine()
+legend.get_frame().set_facecolor("#101b29")
+legend.get_frame().set_edgecolor("#263a50")
 
 plt.tight_layout()
 
-st.pyplot(fig3, use_container_width=True)
+st.pyplot(fig)
+
+plt.close(fig)
 
 
 # ============================================================
-# TABELA ESTATÍSTICA
+# ESTATÍSTICAS
 # ============================================================
 
 st.markdown(
-    '<div class="section-title">'
-    '📈 4. Resumo estatístico'
-    '</div>',
+    '<div class="secao">Resumo estatístico</div>',
     unsafe_allow_html=True
 )
 
-st.markdown(
-    '<div class="section-description">'
-    'Estatísticas descritivas das principais variáveis.'
-    '</div>',
-    unsafe_allow_html=True
-)
-
-
-variaveis = [
+colunas_numericas = [
     "headway_seg",
     "velocidade_permitida_kmh",
     "tempo_ocupacao_circuito_seg"
 ]
 
+estatisticas = df_filtrado[
+    colunas_numericas
+].describe().T
 
-resumo = df_filtrado[variaveis].describe().round(2)
+estatisticas = estatisticas.rename(
+    columns={
+        "count": "Quantidade",
+        "mean": "Média",
+        "std": "Desvio padrão",
+        "min": "Mínimo",
+        "25%": "25%",
+        "50%": "Mediana",
+        "75%": "75%",
+        "max": "Máximo"
+    }
+)
 
+estatisticas = estatisticas.round(2)
 
 st.dataframe(
-    resumo,
+    estatisticas,
     use_container_width=True
 )
 
@@ -495,22 +611,10 @@ st.dataframe(
 # DADOS
 # ============================================================
 
-with st.expander("📋 Visualizar dataset completo"):
+with st.expander("Visualizar dados do dataset"):
 
     st.dataframe(
         df_filtrado,
-        use_container_width=True
+        use_container_width=True,
+        height=400
     )
-
-
-# ============================================================
-# RODAPÉ
-# ============================================================
-
-st.markdown("---")
-
-st.caption(
-    "Dashboard desenvolvido para análise do dataset "
-    "de sinalização ferroviária."
-)
-
