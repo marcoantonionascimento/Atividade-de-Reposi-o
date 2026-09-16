@@ -11,7 +11,6 @@ import seaborn as sns
 
 st.set_page_config(
     page_title="Dashboard de Sinalização Ferroviária",
-    page_icon="🚆",
     layout="wide",
     initial_sidebar_state="expanded"
 )
