@@ -121,7 +121,7 @@ df = carregar_dados()
 st.markdown("""
 <div class="main-header">
 
-    <h1>🚆 Sinalização Ferroviária</h1>
+    <h1> Sinalização Ferroviária</h1>
 
     <p>
         Dashboard de análise de headway, velocidade,
