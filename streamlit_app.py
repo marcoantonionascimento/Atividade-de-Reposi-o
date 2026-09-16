@@ -10,7 +10,6 @@ import seaborn as sns
 
 st.set_page_config(
     page_title="Sinalização Ferroviária",
-    page_icon="🚆",
     layout="wide"
 )
 
@@ -19,7 +18,7 @@ st.set_page_config(
 # TÍTULO
 # ============================================================
 
-st.title("🚆 Análise de Sinalização Ferroviária")
+st.title(" Análise de Sinalização Ferroviária")
 
 st.write(
     "Dashboard para análise dos dados de headway, "
@@ -44,7 +43,7 @@ df = carregar_dados()
 # INFORMAÇÕES DO DATASET
 # ============================================================
 
-st.subheader("📊 Dataset")
+st.subheader(" Dataset")
 
 col1, col2, col3 = st.columns(3)
 
@@ -163,7 +162,7 @@ st.pyplot(fig3)
 # RESUMO ESTATÍSTICO
 # ============================================================
 
-st.subheader("📈 Resumo Estatístico")
+st.subheader(" Resumo Estatístico")
 
 variaveis = [
     "headway_seg",
