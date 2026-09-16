@@ -91,7 +91,7 @@ df_filtrado = df[
 # ============================================================
 
 st.subheader(
-    "2. Distribuição do Headway"
+    "1. Distribuição do Headway"
 )
 
 st.write(
@@ -124,7 +124,7 @@ st.pyplot(fig2)
 # ============================================================
 
 st.subheader(
-    "3. Aspectos dos Sinais por Tipo de Sinalização"
+    "2. Aspectos dos Sinais por Tipo de Sinalização"
 )
 
 st.write(
