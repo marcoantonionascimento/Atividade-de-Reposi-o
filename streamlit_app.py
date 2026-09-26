@@ -150,44 +150,6 @@ ax2.grid(True, axis="y", alpha=0.3)
 st.pyplot(fig2)
 
 
-# ============================================================
-# GRÁFICO 3 - BARRAS EMPILHADAS
-# ============================================================
-
-st.subheader(
-    "3. Aspectos dos Sinais por Tipo de Sinalização"
-)
-
-st.write(
-    "Quantidade de sinais verdes, amarelos e vermelhos "
-    "para cada tipo de sinalização."
-)
-
-contagem = pd.crosstab(
-    df_filtrado["tipo_sinalizacao"],
-    df_filtrado["aspecto_sinal"]
-)
-
-fig3, ax3 = plt.subplots(figsize=(10, 6))
-
-contagem.plot(
-    kind="bar",
-    stacked=True,
-    ax=ax3
-)
-
-ax3.set_xlabel("Tipo de Sinalização")
-ax3.set_ylabel("Quantidade de Ocorrências")
-ax3.set_title(
-    "Aspectos dos Sinais por Tipo de Sinalização"
-)
-
-ax3.tick_params(axis="x", rotation=0)
-
-ax3.grid(True, axis="y", alpha=0.3)
-
-st.pyplot(fig3)
-
 
 # ============================================================
 # RESUMO ESTATÍSTICO
